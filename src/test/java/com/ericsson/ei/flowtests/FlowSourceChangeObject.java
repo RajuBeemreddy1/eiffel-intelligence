@@ -78,7 +78,7 @@ public class FlowSourceChangeObject extends FlowTestBase {
     private ERQueryService erQueryService;
 
     @Before
-    public void before() throws IOException {
+    public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
         upStreamEventsHandler.setEventRepositoryQueryService(erQueryService);
         final URL upStreamResult = this.getClass().getClassLoader().getResource(UPSTREAM_FILE);

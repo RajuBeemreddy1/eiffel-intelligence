@@ -30,8 +30,10 @@ import org.springframework.stereotype.Component;
 import com.ericsson.ei.exception.MongoDBConnectionException;
 import com.ericsson.ei.handlers.ObjectHandler;
 import com.ericsson.ei.jmespath.JmesPathInterface;
+import com.ericsson.ei.rules.RulesHandler;
 import com.ericsson.ei.rules.RulesObject;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.mongodb.MongoExecutionTimeoutException;
 
 @Component
 public class MergeHandler {
@@ -49,6 +51,9 @@ public class MergeHandler {
 
     @Autowired
     private ObjectHandler objectHandler;
+    
+    @Autowired
+    RulesHandler rulesHandler;
 
     public void setJmesPathInterface(JmesPathInterface jmesPathInterface) {
         this.jmesPathInterface = jmesPathInterface;
@@ -62,13 +67,16 @@ public class MergeHandler {
         mergeIdMarker = marker;
     }
 
-    public String mergeObject(String id, String mergeId, RulesObject rules, String event, JsonNode objectToMerge) {
+    public String mergeObject(String id, String mergeId, RulesObject rules, String event, JsonNode objectToMerge) throws MongoExecutionTimeoutException, MongoDBConnectionException {
         String mergedObject = null;
         String preparedToMergeObject;
         try {
             // lock and get the AggregatedObject
             String aggregatedObject = getAggregatedObject(id, true);
             LOGGER.debug("AGGREGATED OBJECT : " + aggregatedObject);
+            if(aggregatedObject == null) {
+            	return null;
+            }            
             String mergeRule = getMergeRules(rules);
             if (mergeRule != null && !mergeRule.isEmpty()) {
                 String updatedRule = replaceIdMarkerInRules(mergeRule, mergeId);
@@ -84,9 +92,13 @@ public class MergeHandler {
             mergedObject = mergeContentToObject(aggregatedObject, preparedToMergeObject);
             LOGGER.debug("Merged Aggregated Object:\n{}", mergedObject);
         } finally {
+        	if(mergedObject == null) {
+            	throw new MongoExecutionTimeoutException(1, "Aggregated object is null");
+            }
+
             // unlocking of document will be performed, when mergedObject will
-            // be inserted to database
-            objectHandler.updateObject(mergedObject, rules, event, id);
+            // be inserted to database     	
+        	objectHandler.updateObject(mergedObject, rules, event, id);
         }
 
         return mergedObject;

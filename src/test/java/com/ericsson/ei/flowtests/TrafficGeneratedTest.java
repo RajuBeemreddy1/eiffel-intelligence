@@ -103,7 +103,7 @@ public class TrafficGeneratedTest extends FlowTestBase {
     private String event_map;
 
     @Before
-    public void before() throws IOException {
+    public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
         upStreamEventsHandler.setEventRepositoryQueryService(erQueryService);
 

@@ -14,7 +14,6 @@
 
 package com.ericsson.ei.handlers;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 
 import org.slf4j.Logger;
@@ -63,9 +62,9 @@ public class UpStreamEventsHandler {
      *
      * @param aggregatedObjectId
      *                               the aggregated object id
-     * @throws IOException
+     * @throws Exception 
      */
-    public void runHistoryExtractionRulesOnAllUpstreamEvents(String aggregatedObjectId) throws IOException {
+    public void runHistoryExtractionRulesOnAllUpstreamEvents(String aggregatedObjectId) throws Exception {
 
         // Use aggregatedObjectId as eventId since they are the same for start
         // events.
@@ -74,13 +73,16 @@ public class UpStreamEventsHandler {
     	final ResponseEntity responseEntity = eventRepositoryQueryService
                 .getEventStreamDataById(aggregatedObjectId, SearchOption.UP_STREAM, -1, -1, true);
         long stop = System.currentTimeMillis();
-        LOGGER.debug("%%%% Response time for upstream query for id: {}: {} ", aggregatedObjectId, stop-start);
+        LOGGER.info("%%%% Response time for upstream query for id: {}: {} ", aggregatedObjectId, stop-start);
+        LOGGER.info("ResponseEntity: " + responseEntity);
     	if (responseEntity == null) {
-            LOGGER.warn("Asked for upstream from {} but got null response entity back!", aggregatedObjectId);
+            LOGGER.info("Asked for upstream from {} but got null response entity back!", aggregatedObjectId);
             return;
         }
 
         final String searchResultString = responseEntity.getBody();
+        LOGGER.info("Search result string is: "+ searchResultString);
+        LOGGER.info("ResponseEntity: " + responseEntity);
         ObjectMapper mapper = new ObjectMapper();
         final JsonNode searchResult = mapper.readTree(searchResultString);
 

@@ -145,7 +145,13 @@ public class RuleControllerImpl implements RuleController{
                 LOGGER.error(errorMessage, e);
                 String errorJsonAsString = ResponseMessage.createJsonMessage(errorMessage);
                 return new ResponseEntity<>(errorJsonAsString, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+            } catch (Exception e) {
+            	String errorMessage = "Internal Server Error: Failed to generate aggregated object.";
+                LOGGER.error(errorMessage, e);
+                String errorJsonAsString = ResponseMessage.createJsonMessage(errorMessage);
+                return new ResponseEntity<>(errorJsonAsString, HttpStatus.INTERNAL_SERVER_ERROR);
+           
+			}
         } else {
             String errorMessage = "Test rules functionality is disabled in backend server. "
                     + "Configure \"testaggregated.enabled\" setting in backend servers properties "

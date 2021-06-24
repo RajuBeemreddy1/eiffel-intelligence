@@ -70,7 +70,7 @@ public class ERQueryService {
      * @return ResponseEntity
      */
     public ResponseEntity getEventStreamDataById(String eventId, SearchOption searchOption, int limit,
-                                                 int levels, boolean tree) {
+                                                 int levels, boolean tree) throws Exception {
         // Due to multiple threads accessing this method we need to have a new http request for each thread
         return getEventStreamDataById(eventId, searchOption, limit, levels, tree, new HttpRequest());
     }
@@ -98,7 +98,7 @@ public class ERQueryService {
      * @return ResponseEntity
      */
     public ResponseEntity getEventStreamDataById(String eventId, SearchOption searchOption, int limit,
-            int levels, boolean tree, final HttpRequest uniqRequest) {
+            int levels, boolean tree, final HttpRequest uniqRequest) throws Exception {
 
         String uri = null;
         try {
@@ -115,7 +115,7 @@ public class ERQueryService {
                         .setBody(searchParameters.getAsJsonString(), ContentType.APPLICATION_JSON);
 
                 uri = uniqRequest.getURI().toString();
-                LOGGER.debug("The URL to ER is: {}", uri);
+                LOGGER.info("The URL to ER is: {}", uri);
 
                 return uniqRequest.performRequest();
             } else {
@@ -124,6 +124,7 @@ public class ERQueryService {
         }
         catch (Exception e) {
             LOGGER.error("Error occurred while executing REST POST to {}, stacktrace: {}", uri, e);
+            throw e;
         }
 
         return null;

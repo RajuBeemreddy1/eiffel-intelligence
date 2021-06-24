@@ -61,7 +61,7 @@ public class ArrayAggregationTest extends FlowTestBase {
     private ERQueryService erQueryService;
 
     @Before
-    public void before() throws IOException {
+    public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
         upStreamEventsHandler.setEventRepositoryQueryService(erQueryService);
 

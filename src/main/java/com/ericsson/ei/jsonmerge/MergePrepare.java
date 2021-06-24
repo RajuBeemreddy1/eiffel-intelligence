@@ -24,7 +24,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -217,14 +216,21 @@ public class MergePrepare {
         try {
             objectJSONObject = new JSONObject(originObject);
             stringObject = objectJSONObject.toString();
-            Object ruleJSONObject = new JSONObject(mergeRule);
+            Object ruleJSONObject;
+            
+            // condition to avoid un-necessary exception to print in the log
+            if(mergeRule.startsWith("{")) {
+            	ruleJSONObject = new JSONObject(mergeRule);
+            } else {
+            	return getMergePathFromArrayMergeRules(originObject, mergeRule, stringObject);
+            }
+
             // hack to remove quotes
             stringRule = ruleJSONObject.toString();
             stringRule = stringRule.replaceAll("\\[\\{", "{");
             stringRule = stringRule.replaceAll("\\}\\]", "}");
         } catch (JSONException e) {
-            LOGGER.warn("Failed to parse JSON.", e);
-            return getMergePathFromArrayMergeRules(originObject, mergeRule, stringObject);
+            LOGGER.warn("Failed to parse mergeRule {} , due to: {}.", mergeRule, e);
         }
         Map<String, Object> flattenJson = JsonFlattener.flattenAsMap(stringObject);
         String flattenRule = JsonFlattener.flatten(stringRule);
@@ -404,7 +410,12 @@ public class MergePrepare {
 
     public String addMissingLevels(String originObject, String objectToMerge, String mergeRule,
             String mergePath) {
-
+         LOGGER.info("addMissingLevels for arguments: before parse\n"
+                 + "originObject was : {}\n"
+                 + "objectTomerge was: {}\n"
+                 + "mergeRule was: {}\n"
+                 + "mergePath was: {}\n",
+                 originObject, objectToMerge, mergeRule, mergePath);
         JSONObject newObject = new JSONObject();
         try {
             JSONArray mergePathArray = new JSONArray(mergePath.split("\\."));
@@ -448,6 +459,12 @@ public class MergePrepare {
                     mergeObject = newObject;
                 }
             }
+            LOGGER.debug("addMissingLevels for arguments: after parse\n"
+                    + "originObject was : {}\n"
+                    + "objectTomerge was: {}\n"
+                    + "mergeRule was: {}\n"
+                    + "mergePath was: {}\n",
+                    originObject, objectToMerge, mergeRule, mergePath);
         } catch (Exception e) {
             LOGGER.error("addMissingLevels failed for arguments:\n"
                     + "originObject was : {}\n"

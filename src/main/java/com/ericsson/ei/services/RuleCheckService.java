@@ -1,10 +1,8 @@
 package com.ericsson.ei.services;
 
-import com.ericsson.ei.exception.MongoDBConnectionException;
-import com.ericsson.ei.handlers.EventHandler;
-import com.ericsson.ei.handlers.EventToObjectMapHandler;
-import com.ericsson.ei.jmespath.JmesPathInterface;
-import com.ericsson.ei.queryservice.ProcessAggregatedObject;
+import java.util.HashSet;
+import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,9 +11,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
+import com.ericsson.ei.handlers.EventHandler;
+import com.ericsson.ei.handlers.EventToObjectMapHandler;
+import com.ericsson.ei.jmespath.JmesPathInterface;
+import com.ericsson.ei.queryservice.ProcessAggregatedObject;
 
 @Component
 public class RuleCheckService implements IRuleCheckService {
@@ -35,7 +34,7 @@ public class RuleCheckService implements IRuleCheckService {
 
     @Override
     public String prepareAggregatedObject(JSONArray listRulesJson, JSONArray listEventsJson)
-            throws JSONException, IOException, MongoDBConnectionException {
+            throws Exception {
         eventHandler.getRulesHandler().setParsedJson(listRulesJson.toString());
         String response;
         // Looping all events and add suffix template name to id and links, For
@@ -48,7 +47,7 @@ public class RuleCheckService implements IRuleCheckService {
             if (templateNames.size() == 1) {
                 addTemplateNameToIds(listEventsJson.getJSONObject(i), templateName);
                 LOGGER.debug("Event to prepare aggregated object :: {}", listEventsJson.getJSONObject(i).toString());
-                eventHandler.eventReceived(listEventsJson.getJSONObject(i).toString());
+                eventHandler.eventReceived(listEventsJson.getJSONObject(i).toString(), false);
             }
         }
         String templateName = templateNames.iterator().next();

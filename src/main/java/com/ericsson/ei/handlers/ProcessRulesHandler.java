@@ -22,10 +22,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.ericsson.ei.exception.MongoDBConnectionException;
 import com.ericsson.ei.jmespath.JmesPathInterface;
 import com.ericsson.ei.jsonmerge.MergeHandler;
 import com.ericsson.ei.rules.RulesObject;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.mongodb.MongoExecutionTimeoutException;
 
 @Component
 public class ProcessRulesHandler {
@@ -49,7 +51,7 @@ public class ProcessRulesHandler {
         this.mergeHandler = mergeHandler;
     }
 
-    public String runProcessRules(String event, RulesObject rulesObject, String aggregationObject, String objectId, String mergeId) {
+    public String runProcessRules(String event, RulesObject rulesObject, String aggregationObject, String objectId, String mergeId) throws MongoExecutionTimeoutException, MongoDBConnectionException {
         String processRules = rulesObject.fetchProcessRules();
         if (processRules != null) {
             String identifyRule = rulesHandler.getRulesForEvent(event).getIdentifyRules();

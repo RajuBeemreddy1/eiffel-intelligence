@@ -43,7 +43,7 @@ public class UpStreamEventHandlerTest {
     static Logger log = LoggerFactory.getLogger(UpStreamEventHandlerTest.class);
 
     @Test
-    public void testRunHistoryExtractionRulesOnAllUpstreamEvents() throws IOException {
+    public void testRunHistoryExtractionRulesOnAllUpstreamEvents() throws Exception {
         // TO DO to complete implementation
         String upStreamString = "{\"upstreamLinkObjects\":[\n" + "\t\t{\"_id\":\"event1_level_1\"},[\n"
                 + "\t\t\t{\"_id\":\"event2_level_2\"},\n" + "\t\t\t{\"_id\":\"event3_level_2\"},[\n"

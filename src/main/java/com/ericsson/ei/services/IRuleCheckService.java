@@ -28,6 +28,6 @@ public interface IRuleCheckService {
      * @throws MongoDBConnectionException 
      */
     String prepareAggregatedObject(JSONArray listRulesJson, JSONArray listEventsJson)
-            throws JSONException, JsonProcessingException, IOException, MongoDBConnectionException;
+            throws JSONException, JsonProcessingException, IOException, MongoDBConnectionException, Exception;
 
 }

@@ -97,8 +97,13 @@ public class FlowTest extends FlowTestBase {
             objectNode.set("downstreamLinkObjects", objectMapper.createArrayNode());
 
             Header[] headers = {};
-            when(erQueryService.getEventStreamDataById(anyString(), any(SearchOption.class), anyInt(), anyInt(),
-                    anyBoolean())).thenReturn(new ResponseEntity(200, objectNode.toString(), headers));
+            try {
+				when(erQueryService.getEventStreamDataById(anyString(), any(SearchOption.class), anyInt(), anyInt(),
+				        anyBoolean())).thenReturn(new ResponseEntity(200, objectNode.toString(), headers));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         } else {
             final URL upStreamInput = this.getClass().getClassLoader().getResource(UPSTREAM_INPUT_FILE);
             ArrayNode upstreamJson = (ArrayNode) objectMapper.readTree(upStreamInput);
