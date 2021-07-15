@@ -73,10 +73,9 @@ public class UpStreamEventsHandler {
     	final ResponseEntity responseEntity = eventRepositoryQueryService
                 .getEventStreamDataById(aggregatedObjectId, SearchOption.UP_STREAM, -1, -1, true);
         long stop = System.currentTimeMillis();
-        LOGGER.info("%%%% Response time for upstream query for id: {}: {} ", aggregatedObjectId, stop-start);
-        LOGGER.info("ResponseEntity: " + responseEntity);
+        LOGGER.debug("%%%% Response time for upstream query for id: {}: {} ", aggregatedObjectId, stop-start);
     	if (responseEntity == null) {
-            LOGGER.info("Asked for upstream from {} but got null response entity back!", aggregatedObjectId);
+            LOGGER.warn("Asked for upstream from {} but got null response entity back!", aggregatedObjectId);
             return;
         }
 

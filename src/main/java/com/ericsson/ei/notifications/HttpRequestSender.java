@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -38,8 +40,9 @@ public class HttpRequestSender {
 
     private RestOperations rest;
 
-    public HttpRequestSender(RestTemplateBuilder builder) {
-        rest = builder.build();
+    @Autowired
+    public HttpRequestSender(RestTemplateBuilder builder, @Value("${notification.request.timeout}") final int timeOut) {
+            rest = builder.setReadTimeout(timeOut).setConnectTimeout(timeOut).build();
     }
 
     /**
@@ -53,9 +56,10 @@ public class HttpRequestSender {
     public boolean postDataMultiValue(String url, HttpEntity<?> request)
             throws AuthenticationException {
         ResponseEntity<JsonNode> response;
-
+        long start = 0;
         try {
             LOGGER.info("Performing HTTP request to url: {}", url);
+            start = System.currentTimeMillis();
             response = rest.postForEntity(url, request, JsonNode.class);
 
         } catch (HttpClientErrorException e) {
@@ -67,7 +71,9 @@ public class HttpRequestSender {
             LOGGER.error("HttpServerErrorException, HTTP request to url {} failed\n", url, e);
             return false;
         } catch (Exception e) {
-            LOGGER.error("HTTP request to url {} failed\n", url, e);
+            LOGGER.error("HTTP request to url {} failed\n", url, e.getCause());
+            long stop = System.currentTimeMillis();
+            LOGGER.info("#### Response time to comeout from rest call in seconds: {} ", (stop-start)/1000);
             return false;
         }
 

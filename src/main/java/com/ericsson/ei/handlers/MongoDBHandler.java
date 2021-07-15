@@ -16,6 +16,8 @@ package com.ericsson.ei.handlers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -31,6 +33,7 @@ import org.springframework.stereotype.Component;
 
 import com.ericsson.ei.exception.MongoDBConnectionException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.collect.Multiset.Entry;
 import com.mongodb.BasicDBObject;
 import com.mongodb.Block;
 import com.mongodb.MongoClient;
@@ -312,12 +315,34 @@ public class MongoDBHandler {
 		try {
 			MongoCollection<Document> collection = getMongoCollection(dataBaseName, collectionName);
 			IndexOptions indexOptions = new IndexOptions().expireAfter((long) ttlValue, TimeUnit.SECONDS);
+
+			// Dropping the previous index on the collection to avoid exceptions
+			// when configuration changes for the fieldName.
+			dropTTLIndex(collection, fieldName);
 			collection.createIndex(Indexes.ascending(fieldName), indexOptions);
 		} catch (Exception e) {
-			throw new MongoDBConnectionException("MongoDB Connection down");
+			throw new MongoDBConnectionException("MongoDB Connection down", e);
 		}
 	}	
   
+	private void dropTTLIndex(final MongoCollection<Document> collection, String fieldName) throws Exception {
+	    boolean indexExists = false;
+	    for (Document index : collection.listIndexes()) {
+	        for (Map.Entry<String, Object> entry : index.entrySet()) {
+	            Object value = entry.getValue();
+	            if(value.equals(fieldName + "_1")) {
+	                indexExists = true;
+	                break;
+	            }
+	        }
+	    }
+
+	    if(indexExists) {
+	        LOGGER.debug("Dropping the index for " + collection.getNamespace());
+	        collection.dropIndex(fieldName + "_1");     
+	    }
+	}
+
     private MongoCollection<Document> getMongoCollection(final String dataBaseName, final String collectionName) throws MongoClientException{
     	
     	if (mongoClient == null) {

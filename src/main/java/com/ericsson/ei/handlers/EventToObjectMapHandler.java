@@ -109,10 +109,10 @@ public class EventToObjectMapHandler {
             	LOGGER.debug("MongoDbHandler Insert/Update Event: {}\nto database: {} and to Collection: {}", mapStr, databaseName, collectionName);	
                 
                 Document document = Document.parse(mapStr);
-                //document.append("Time", DateUtils.getDate());
+                document.append("Time", DateUtils.getDate());
             	
             	if(ttlValue > 0 && !isTTLCreated) {                 
-            		//mongodbhandler.createTTLIndex(databaseName, collectionName, "Time", ttlValue);
+            		mongodbhandler.createTTLIndex(databaseName, collectionName, "Time", ttlValue);
             		isTTLCreated = true;
             	}
             	mongodbhandler.insertDocumentObject(databaseName, collectionName, document);

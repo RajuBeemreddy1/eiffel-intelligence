@@ -59,10 +59,10 @@ public class EventHandler {
         return rulesHandler;
     }
 
-    public void eventReceived(final String event, final boolean isRelivered)
+    public void eventReceived(final String event, final boolean isRedelivered)
             throws MongoDBConnectionException, Exception {
         final RulesObject eventRules = rulesHandler.getRulesForEvent(event);
-        idRulesHandler.runIdRules(eventRules, event, isRelivered);
+        idRulesHandler.runIdRules(eventRules, event, isRedelivered);
     }
 
     @Async("eventHandlerExecutor")

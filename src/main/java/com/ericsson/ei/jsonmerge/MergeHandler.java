@@ -92,13 +92,13 @@ public class MergeHandler {
             mergedObject = mergeContentToObject(aggregatedObject, preparedToMergeObject);
             LOGGER.debug("Merged Aggregated Object:\n{}", mergedObject);
         } finally {
-        	if(mergedObject == null) {
-            	throw new MongoExecutionTimeoutException(1, "Aggregated object is null");
-            }
+        if(mergedObject == null) {
+            throw new MongoExecutionTimeoutException(1, "Aggregated object is null");
+        }
 
-            // unlocking of document will be performed, when mergedObject will
-            // be inserted to database     	
-        	objectHandler.updateObject(mergedObject, rules, event, id);
+          // unlocking of document will be performed, when mergedObject will
+          // be inserted to database
+          objectHandler.updateObject(mergedObject, rules, event, id);
         }
 
         return mergedObject;

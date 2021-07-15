@@ -74,6 +74,8 @@ public class InformSubscriber {
     @Getter
     @Value("${notification.ttl.value}")
     private int ttlValue;
+    
+    private boolean isTTLCreated;
 
     @Autowired
     private JmesPathInterface jmespath;
@@ -132,8 +134,11 @@ public class InformSubscriber {
             LOGGER.info(
                     "Failed to inform subscriber '{}'\nPrepared 'missed notification' document : {}",
                     e.getMessage(), missedNotification);
-            mongoDBHandler.createTTLIndex(missedNotificationDataBaseName,
-                    missedNotificationCollectionName, "Time", ttlValue);
+            if(ttlValue > 0 && !isTTLCreated) {                 
+                mongoDBHandler.createTTLIndex(missedNotificationDataBaseName,
+                        missedNotificationCollectionName, "Time", ttlValue);
+                isTTLCreated = true;
+            }
             saveMissedNotificationToDB(missedNotification);
         }
     }
